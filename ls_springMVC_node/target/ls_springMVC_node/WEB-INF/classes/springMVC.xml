@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <!--注解扫描器-->
+    <context:component-scan base-package="top.undefinded.controller"/>
+
+    <!--视图解析器-->
+    <bean id="internalResourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix" value="/WEB-INF/pages/"/>
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!-- 配置类型转换器工厂 -->
+    <bean id="converterService"
+          class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <!-- 给工厂注入一个新的类型转换器 -->
+        <property name="converters">
+            <array>
+                <!-- 配置自定义类型转换器 -->
+                <bean class="top.undefinded.domain.StringToDateConverter"></bean>
+            </array>
+        </property>
+    </bean>
+    <!--开启SpringMVC框架注解支持-->
+    <mvc:annotation-driven conversion-service="converterService"/>
+    <!-- 设置静态资源不过滤 -->
+    <mvc:resources location="/css/" mapping="/css/**"/> <!-- 样式 -->
+    <mvc:resources location="/images/" mapping="/images/**"/> <!-- 图片 -->
+    <mvc:resources location="/js/" mapping="/js/**"/> <!-- javascript -->
+
+    <!-- 配置文件解析器对象，要求id名称必须是multipartResolver -->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="10485760"/>
+    </bean>
+
+    <!--配置异常处理器-->
+    <bean id="sysExceptionResolver" class="top.undefinded.exception.SysExceptionResolver"></bean>
+
+<!--拦截器配置的先后决定实际的先后-->
+    <!-- 配置拦截器：MyInterceptor01 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!-- 哪些方法进行拦截 -->
+            <mvc:mapping path="/user/interceptor"/>
+            <!-- 哪些方法不进行拦截
+            <mvc:exclude-mapping path=""/>
+            -->
+            <!-- 注册拦截器对象 -->
+            <bean class="top.undefinded.interceptor.MyInterceptor01"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+    <!-- 配置拦截器：MyInterceptor02 -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!-- 哪些方法进行拦截 -->
+            <mvc:mapping path="/user/interceptor"/>
+            <!-- 哪些方法不进行拦截
+            <mvc:exclude-mapping path=""/>
+            -->
+            <!-- 注册拦截器对象 -->
+            <bean class="top.undefinded.interceptor.MyInterceptor02"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+</beans>
